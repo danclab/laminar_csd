@@ -2,7 +2,7 @@
 
 import numpy as np
 
-def set_params(net, params, sim_shank=False):
+def set_params(net, params, sim_shank=False, hypo=2):
     print(f"Setting parameters: {params}")
 
     weights_ampa_d1 = {'L2_basket': 0.001,
@@ -56,32 +56,51 @@ def set_params(net, params, sim_shank=False):
                          weights_ampa=weights_ampa_p1,
                          weights_nmda=weights_nmda_p1,
                          synaptic_delays=synaptic_delays_prox)
-    
-    # Distal 3
-    weights_ampa_d3 = {'L2_basket': params['evdist3_ampa_L2_basket'],
-                       'L2_pyramidal': params['evdist3_ampa_L2_pyramidal'],
-                       'L5_pyramidal': params['evdist3_ampa_L5_pyramidal']}
-    weights_nmda_d3 = {'L2_basket': params['evdist3_nmda_L2_basket'],
-                       'L2_pyramidal': params['evdist3_nmda_L2_pyramidal'],
-                       'L5_pyramidal': params['evdist3_nmda_L5_pyramidal']}
-    synaptic_delays_d3 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                      'L5_pyramidal': 0.1}
 
-    net.add_evoked_drive('evdist3',
-                         mu=params['evdist3_mu'],
-                         sigma=params['evdist3_sigma'],
-                         numspikes=1,
-                         location='distal',
-                         weights_ampa=weights_ampa_d3,
-                         weights_nmda=weights_nmda_d3,
-                         synaptic_delays=synaptic_delays_d3)
+    if hypo == 1:
+        # Distal 3
+        weights_ampa_d3 = {'L2_basket': params['evdist3_ampa_L2_basket'],
+                           'L2_pyramidal': params['evdist3_ampa_L2_pyramidal'],
+                           'L5_pyramidal': params['evdist3_ampa_L5_pyramidal']}
+        weights_nmda_d3 = {'L2_basket': params['evdist3_nmda_L2_basket'],
+                           'L2_pyramidal': params['evdist3_nmda_L2_pyramidal'],
+                           'L5_pyramidal': params['evdist3_nmda_L5_pyramidal']}
+        synaptic_delays_d3 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                          'L5_pyramidal': 0.1}
+    
+        net.add_evoked_drive('evdist3',
+                             mu=params['evdist3_mu'],
+                             sigma=params['evdist3_sigma'],
+                             numspikes=1,
+                             location='distal',
+                             weights_ampa=weights_ampa_d3,
+                             weights_nmda=weights_nmda_d3,
+                             synaptic_delays=synaptic_delays_d3)
+    if hypo == 2:
+        # Proximal 2
+        weights_ampa_p2 = {'L2_basket': params['evprox2_ampa_L2_basket'],
+                           'L2_pyramidal': params['evprox2_ampa_L2_pyramidal'],
+                           'L5_basket': params['evprox2_ampa_L5_basket'],
+                           'L5_pyramidal': params['evprox2_ampa_L5_pyramidal']}
+        weights_nmda_p2 = {'L2_basket': params['evprox2_nmda_L2_basket'],
+                           'L2_pyramidal': params['evprox2_nmda_L2_pyramidal'],
+                           'L5_basket': params['evprox2_nmda_L5_basket'],
+                           'L5_pyramidal': params['evprox2_nmda_L5_pyramidal']}
+        synaptic_delays_prox2 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                            'L5_basket': 1., 'L5_pyramidal': 1.}
+        net.add_evoked_drive('evprox2',
+                             mu=params['evprox2_mu'],
+                             sigma=params['evprox2_sigma'],
+                             numspikes=1,
+                             location='proximal',
+                             weights_ampa=weights_ampa_p2,
+                             weights_nmda=weights_nmda_p2,
+                             synaptic_delays=synaptic_delays_prox2)
 
     if sim_shank:
-        # Simulate shank recordings
+        # Simulate shank recordings - 0 is L5 cell bodies, cortex thickness about 2850um, 
         net.set_cell_positions(inplane_distance=30.)
-        #depths = list(range(-325, 2150, 100))
-        #depths = np.linspace(-1640, 2300, 11)
-        depths = list(range(-325,2150,int((2150--325)/11)))
+        depths = list(range(-850,2100,int((2100--850)/11)))
         electrode_pos = [(135, 135, dep) for dep in depths]
         net.add_electrode_array('shank', electrode_pos)
 

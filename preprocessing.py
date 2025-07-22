@@ -12,10 +12,10 @@ def preprocess_erf(file_path, output_folder, sfreq, h_freq):
     time = time_ - time_.min() #so that it's starting at 0 (dipole isn't understood otherwise)
 
     # check if the time is between 1000 and 1200, calculate mean and check if > 0 (if the main deflection is positive)
-    time_mask = (time >= 1000.) & (time <= 1200.)
+    time_mask = (time >= 1000.) & (time <= 1100.)
     max_peak = np.max(erf[time_mask])
 
-    if max_peak > 0:
+    if max_peak < 0:
         reversed_flag = True
     else:
         reversed_flag = False
